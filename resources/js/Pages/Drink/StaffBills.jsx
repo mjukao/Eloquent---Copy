@@ -2,6 +2,17 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 
+// ฟังก์ชันจัดรูปแบบวันที่และเวลา
+const formatDateTime = (dateString) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0'); // เติม 0 ถ้าวันเป็นเลขตัวเดียว
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // เดือนเริ่มจาก 0 เลยต้อง +1
+    const year = date.getFullYear() + 543; // แปลงเป็น พ.ศ.
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+};
+
 const StaffBills = () => {
     const [bills, setBills] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -59,6 +70,7 @@ const StaffBills = () => {
                                     </li>
                                 ))}
                             </ul>
+                            <span>เวลา : {formatDateTime(bill.updated_at)}</span>
                         </li>
                     ))}
                 </ul>
