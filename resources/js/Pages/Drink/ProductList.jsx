@@ -107,6 +107,14 @@ const ProductList = () => {
         cursor: 'pointer',
     };
 
+    const imageStyle = {
+        width: '100%',
+        height: '100px',
+        objectFit: 'cover',
+        borderRadius: '4px',
+        marginBottom: '10px',
+    };
+
     const billStyle = {
         border: '1px solid #ddd',
         borderRadius: '8px',
@@ -114,11 +122,25 @@ const ProductList = () => {
         backgroundColor: '#fff',
         display: 'flex',
         flexDirection: 'column',
+        height: '80vh',
+    };
+
+    const billItemStyle = {
+        display: 'flex',
         justifyContent: 'space-between',
+        marginBottom: '10px',
+        alignItems: 'center',
+    };
+
+    const billListStyle = {
+        maxHeight: '50vh',
+        overflowY: 'auto',
+        listStyleType: 'none',
+        padding: '0',
+        margin: '0',
     };
 
     const buttonStyle = {
-        marginTop: '10px',
         padding: '10px 20px',
         backgroundColor: '#28a745',
         color: '#fff',
@@ -128,17 +150,8 @@ const ProductList = () => {
     };
 
     const totalStyle = {
-        marginTop: '20px',
         fontWeight: 'bold',
         fontSize: '18px',
-        textAlign: 'right',
-    };
-
-    const billItemStyle = {
-        display: 'flex',
-        justifyContent: 'space-between',
-        marginBottom: '10px',
-        alignItems: 'center',
     };
 
     const inputStyle = {
@@ -173,6 +186,13 @@ const ProductList = () => {
         padding: '2px',
     };
 
+    const billFooterStyle = {
+        marginTop: '20px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    };
+
     return (
         <AuthenticatedLayout>
             <div style={containerStyle}>
@@ -186,6 +206,17 @@ const ProductList = () => {
                                 style={itemStyle}
                                 onClick={() => addToBill(product)}
                             >
+                                {product.image_url ? (
+                                    <img
+                                        src={product.image_url}
+                                        alt={product.name}
+                                        style={imageStyle}
+                                    />
+                                ) : (
+                                    <div style={{ ...imageStyle, backgroundColor: '#ddd' }}>
+                                        ไม่มีรูปภาพ
+                                    </div>
+                                )}
                                 <strong>{product.name}</strong>
                                 <br />
                                 <span>
@@ -212,7 +243,7 @@ const ProductList = () => {
                         {billItems.length === 0 ? (
                             <p style={{ textAlign: 'center', color: '#999' }}>ยังไม่มีสินค้าในบิล</p>
                         ) : (
-                            <ul style={{ listStyleType: 'none', padding: 0 }}>
+                            <ul style={billListStyle}>
                                 {billItems.map((item) => (
                                     <li key={item.id} style={billItemStyle}>
                                         <span>{item.name}</span>
@@ -251,7 +282,7 @@ const ProductList = () => {
                             </ul>
                         )}
                     </div>
-                    <div>
+                    <div style={billFooterStyle}>
                         <div style={totalStyle}>รวม: ${calculateTotal()}</div>
                         <button style={buttonStyle} onClick={saveBill}>
                             บันทึกบิล
