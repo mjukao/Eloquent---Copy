@@ -5,14 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Bill extends Model
+class BillSummary extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['table_number', 'total', 'status'];
+    protected $fillable = ['table_number', 'total'];
 
     public function items()
     {
-        return $this->hasMany(BillItem::class);
+        return $this->hasMany(BillItem::class, 'bill_id');
     }
 }

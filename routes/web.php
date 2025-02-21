@@ -48,4 +48,9 @@ Route::get('/orders', function () {
     return Inertia::render('Drink/Orders');
 })->name('orders');
 
+// Add the new route to render the BillSummary page
+Route::get('/billsummary', function () {
+    return Inertia::render('Drink/Billsummary');
+})->name('billsummary');
+
 require __DIR__.'/auth.php';
