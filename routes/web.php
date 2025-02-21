@@ -43,9 +43,9 @@ Route::get('/staff', function () {
     return Inertia::render('Drink/Staff');
 })->name('staff');
 
-// Add the new route to render the Staff Bills page
-Route::get('/staff-bills', function () {
-    return Inertia::render('Drink/StaffBills');
-})->name('staff-bills');
+// Add the new route to render the Orders page
+Route::get('/orders', function () {
+    return Inertia::render('Drink/Orders');
+})->name('orders');
 
 require __DIR__.'/auth.php';

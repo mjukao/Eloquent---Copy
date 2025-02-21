@@ -37,10 +37,10 @@ export default function AuthenticatedLayout({ header, children }) {
                                     Drink Management
                                 </NavLink>
                                 <NavLink
-                                    href={route('staff-bills')}
-                                    active={route().current('staff-bills')}
+                                    href={route('orders')}
+                                    active={route().current('orders')}
                                 >
-                                    Staff Bills
+                                    Orders
                                 </NavLink>
                             </div>
                         </div>
@@ -153,10 +153,10 @@ export default function AuthenticatedLayout({ header, children }) {
                             Drink Management
                         </ResponsiveNavLink>
                         <ResponsiveNavLink
-                            href={route('staff-bills')}
-                            active={route().current('staff-bills')}
+                            href={route('orders')}
+                            active={route().current('orders')}
                         >
-                            Staff Bills
+                            Orders
                         </ResponsiveNavLink>
                     </div>
 
