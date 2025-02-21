@@ -18,32 +18,39 @@ const Orders = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    // ฟังก์ชันโหลดข้อมูลบิล
+    const fetchBills = async () => {
+        try {
+            const response = await axios.get('/api/bills');
+            setBills(response.data.filter(bill => bill.status !== 'completed')); // กรองเฉพาะบิลที่ยังไม่สำเร็จ
+            setLoading(false);
+        } catch (err) {
+            setError(err.message || 'Failed to fetch bills');
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        axios.get('/api/bills')
-            .then((response) => {
-                setBills(response.data);
-            })
-            .catch((err) => {
-                setError(err.message || 'Failed to fetch bills');
-            })
-            .finally(() => {
-                setLoading(false);
-            });
+        fetchBills();
     }, []);
 
     // ฟังก์ชันสำหรับทำเครื่องหมายบิลว่าสำเร็จ
     const handleCompleteBill = async (billId) => {
-        try {
-            const response = await axios.patch(`/api/bills/${billId}/complete`, {
-                status: 'completed'
-            });
+        const isConfirmed = window.confirm('คุณแน่ใจหรือไม่ว่าต้องการทำรายการนี้ให้สำเร็จ?');
+        
+        if (isConfirmed) {
+            try {
+                const response = await axios.patch(`/api/bills/${billId}/complete`, {
+                    status: 'completed'
+                });
 
-            // Remove the completed bill from the state
-            setBills(bills.filter(bill => bill.id !== billId));
-
-            alert('ทำรายการสำเร็จเรียบร้อย');
-        } catch (err) {
-            setError(err.message || 'Failed to update bill status');
+                // ลบรายการบิลออกจาก state ทันที
+                setBills(bills.filter(bill => bill.id !== billId));
+                alert('ทำรายการสำเร็จเรียบร้อย');
+            } catch (err) {
+                setError(err.message || 'Failed to update bill status');
+                alert('เกิดข้อผิดพลาดในการอัพเดทสถานะบิล');
+            }
         }
     };
 
