@@ -48,15 +48,15 @@ class BillController extends Controller
             ]);
 
             foreach ($bill->items as $item) {
-                BillItem::create([
-                    'bill_id' => $billSummary->id,
-                    'product_id' => $item->product_id,
-                    'quantity' => $item->quantity,
-                    'price' => $item->price,
-                ]);
+                // Avoid creating duplicate BillItem entries
+                BillItem::updateOrCreate(
+                    ['bill_id' => $billSummary->id, 'product_id' => $item->product_id],
+                    ['quantity' => $item->quantity, 'price' => $item->price]
+                );
             }
 
-            return response()->json($bill->load('items.product'), 200);
+
+            return response()->json($billSummary->load('items.product'), 200);
         } catch (\Exception $e) {
             Log::error('Failed to complete bill: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to complete bill'], 500);

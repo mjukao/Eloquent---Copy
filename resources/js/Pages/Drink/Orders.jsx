@@ -24,33 +24,26 @@ const Orders = () => {
                 setBills(response.data);
             })
             .catch((err) => {
-                setError(err.message || 'ไม่สามารถดึงข้อมูลบิลได้');
+                setError(err.message || 'Failed to fetch bills');
             })
             .finally(() => {
                 setLoading(false);
             });
     }, []);
 
-    // ฟังก์ชันสำหรับทำเครื่องหมายบิลว่าสำเร็จและลบหลังยืนยัน
+    // ฟังก์ชันสำหรับทำเครื่องหมายบิลว่าสำเร็จ
     const handleCompleteBill = async (billId) => {
         try {
-            // แสดงกล่องยืนยัน
-            const confirmed = window.confirm('คุณแน่ใจหรือไม่ว่าต้องการทำรายการสำเร็จ?');
-            if (!confirmed) return; // ถ้ากดยกเลิก จะไม่ดำเนินการต่อ
-
-            // ส่งคำขอไปยัง backend เพื่ออัปเดตสถานะ
             const response = await axios.patch(`/api/bills/${billId}/complete`, {
                 status: 'completed'
             });
 
-            // แจ้งเตือนว่าทำสำเร็จ
-            alert('ทำรายการสำเร็จเรียบร้อย');
-
-            // ลบ بิลออกจาก state เพื่อให้หายไปจากหน้า
+            // Remove the completed bill from the state
             setBills(bills.filter(bill => bill.id !== billId));
+
+            alert('ทำรายการสำเร็จเรียบร้อย');
         } catch (err) {
-            setError(err.message || 'ไม่สามารถอัปเดตสถานะบิลได้');
-            alert('เกิดข้อผิดพลาด: ' + (err.message || 'ไม่สามารถอัปเดตสถานะบิลได้'));
+            setError(err.message || 'Failed to update bill status');
         }
     };
 
@@ -102,7 +95,7 @@ const Orders = () => {
                                     </li>
                                 ))}
                             </ul>
-                            <span>เวลา: {formatDateTime(bill.updated_at)}</span>
+                            <span>เวลา : {formatDateTime(bill.updated_at)}</span>
                             <br />
                             {bill.status !== 'completed' ? (
                                 <button
