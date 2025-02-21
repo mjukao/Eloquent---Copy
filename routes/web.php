@@ -35,7 +35,17 @@ Route::middleware('auth')->group(function () {
 
 // Add the new route to render the Drink page
 Route::get('/drink', function () {
-    return Inertia::render('Drink/ProductList');
+    return Inertia::render('Drink');
 })->name('drink');
+
+// Add the new route to render the Staff page
+Route::get('/staff', function () {
+    return Inertia::render('Drink/Staff');
+})->name('staff');
+
+// Add the new route to render the Staff Bills page
+Route::get('/staff-bills', function () {
+    return Inertia::render('Drink/StaffBills');
+})->name('staff-bills');
 
 require __DIR__.'/auth.php';

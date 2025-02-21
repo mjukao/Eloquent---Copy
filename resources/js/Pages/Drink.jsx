@@ -6,10 +6,7 @@ import CategoryList from './Drink/CategoryList';
 const Drink = () => {
     return (
         <div>
-            <h1>Drink Management</h1>
             <ProductList />
-            <CategoryList />
-            <OrderList />
         </div>
     );
 };

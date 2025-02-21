@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 
 const ProductList = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [billItems, setBillItems] = useState([]);
+    const [tableNumber, setTableNumber] = useState('');
 
     useEffect(() => {
         axios.get('/api/products')
@@ -33,9 +35,44 @@ const ProductList = () => {
         });
     };
 
+    const updateQuantity = (productId, newQuantity) => {
+        setBillItems((prevItems) => {
+            if (newQuantity <= 0) {
+                return prevItems.filter(item => item.id !== productId);
+            }
+            return prevItems.map(item =>
+                item.id === productId ? { ...item, quantity: newQuantity } : item
+            );
+        });
+    };
+
     const saveBill = () => {
-        alert('Bill saved!');
-        console.log('Bill items:', billItems);
+        if (!tableNumber) {
+            alert('กรุณากรอกหมายเลขโต๊ะ');
+            return;
+        }
+
+        const billData = {
+            table_number: tableNumber,
+            total: calculateTotal(),
+            items: billItems.map(item => ({
+                product_id: item.id,
+                quantity: item.quantity,
+                price: item.price,
+            })),
+        };
+
+        axios.post('/api/bills', billData)
+            .then(response => {
+                alert(`บันทึกบิลสำหรับโต๊ะ ${tableNumber} เรียบร้อย!`);
+                console.log('Saved Bill:', response.data);
+                setBillItems([]);
+                setTableNumber('');
+            })
+            .catch(err => {
+                alert('Failed to save bill');
+                console.error(err);
+            });
     };
 
     const calculateTotal = () => {
@@ -44,7 +81,7 @@ const ProductList = () => {
             .toFixed(2);
     };
 
-    if (loading) return <h2 style={{ textAlign: 'center' }}>Loading products...</h2>;
+    if (loading) return <h2 style={{ textAlign: 'center' }}>กำลังโหลดสินค้า...</h2>;
     if (error) return <h2 style={{ textAlign: 'center', color: 'red' }}>{error}</h2>;
 
     const containerStyle = {
@@ -94,69 +131,135 @@ const ProductList = () => {
         marginTop: '20px',
         fontWeight: 'bold',
         fontSize: '18px',
-        textAlign: 'right',  // ทำให้ราคาตัวรวมชิดขวา
+        textAlign: 'right',
     };
 
-    // เพิ่ม billItemStyle ใหม่เพื่อจัดระเบียบ
     const billItemStyle = {
         display: 'flex',
         justifyContent: 'space-between',
         marginBottom: '10px',
+        alignItems: 'center',
+    };
+
+    const inputStyle = {
+        marginBottom: '10px',
+        padding: '10px',
+        fontSize: '16px',
+        width: '100%',
+        border: '1px solid #ddd',
+        borderRadius: '5px',
+    };
+
+    const quantityControlStyle = {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '5px',
+    };
+
+    const quantityButtonStyle = {
+        width: '25px',
+        height: '25px',
+        border: '1px solid #ddd',
+        borderRadius: '4px',
+        backgroundColor: '#f0f0f0',
+        cursor: 'pointer',
+    };
+
+    const quantityInputStyle = {
+        width: '40px',
+        textAlign: 'center',
+        border: '1px solid #ddd',
+        borderRadius: '4px',
+        padding: '2px',
     };
 
     return (
-        <div style={containerStyle}>
-            {/* รายการสินค้า */}
-            <div>
-                <h1 style={{ textAlign: 'center' }}>Product List</h1>
-                <ul style={productGridStyle}>
-                    {products.map((product) => (
-                        <li
-                            key={product.id}
-                            style={itemStyle}
-                            onClick={() => addToBill(product)}
-                        >
-                            <strong>{product.name}</strong>
-                            <br />
-                            <span>
-                                ${product.price && !isNaN(Number(product.price))
-                                    ? Number(product.price).toFixed(2)
-                                    : 'N/A'}
-                            </span>
-                        </li>
-                    ))}
-                </ul>
-            </div>
+        <AuthenticatedLayout>
+            <div style={containerStyle}>
+                {/* รายการสินค้า */}
+                <div>
+                    <h1 style={{ textAlign: 'center' }}>รายการสินค้า</h1>
+                    <ul style={productGridStyle}>
+                        {products.map((product) => (
+                            <li
+                                key={product.id}
+                                style={itemStyle}
+                                onClick={() => addToBill(product)}
+                            >
+                                <strong>{product.name}</strong>
+                                <br />
+                                <span>
+                                    ${product.price && !isNaN(Number(product.price))
+                                        ? Number(product.price).toFixed(2)
+                                        : 'N/A'}
+                                </span>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
 
-            {/* บิล */}
-            <div style={billStyle}>
-                <div>
-                    <h1 style={{ textAlign: 'center' }}>Bill</h1>
-                    {billItems.length === 0 ? (
-                        <p style={{ textAlign: 'center', color: '#999' }}>No items in the bill.</p>
-                    ) : (
-                        <ul style={{ listStyleType: 'none', padding: 0 }}>
-                            {billItems.map((item, index) => (
-                                <li key={index} style={billItemStyle}>
-                                    <span>{item.name} x {item.quantity}</span>
-                                    <span>
-                                        ${item.price
-                                            ? (Number(item.price) * item.quantity).toFixed(2)
-                                            : 'N/A'}
-                                    </span>
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-                </div>
-                <div>
-                    <div style={totalStyle}>Total: ${calculateTotal()}</div>
-                    <button style={buttonStyle} onClick={saveBill}>
-                        Save Bill
-                    </button>
+                {/* บิล */}
+                <div style={billStyle}>
+                    <div>
+                        <h1 style={{ textAlign: 'center' }}>บิล</h1>
+                        <input
+                            type="text"
+                            placeholder="กรอกหมายเลขโต๊ะ"
+                            value={tableNumber}
+                            onChange={(e) => setTableNumber(e.target.value)}
+                            style={inputStyle}
+                        />
+                        {billItems.length === 0 ? (
+                            <p style={{ textAlign: 'center', color: '#999' }}>ยังไม่มีสินค้าในบิล</p>
+                        ) : (
+                            <ul style={{ listStyleType: 'none', padding: 0 }}>
+                                {billItems.map((item) => (
+                                    <li key={item.id} style={billItemStyle}>
+                                        <span>{item.name}</span>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                            <div style={quantityControlStyle}>
+                                                <button
+                                                    style={quantityButtonStyle}
+                                                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                                >
+                                                    -
+                                                </button>
+                                                <input
+                                                    type="number"
+                                                    value={item.quantity}
+                                                    onChange={(e) =>
+                                                        updateQuantity(item.id, Number(e.target.value) || 1)
+                                                    }
+                                                    style={quantityInputStyle}
+                                                    min="1"
+                                                />
+                                                <button
+                                                    style={quantityButtonStyle}
+                                                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                                >
+                                                    +
+                                                </button>
+                                            </div>
+                                            <span>
+                                                ${item.price
+                                                    ? (Number(item.price) * item.quantity).toFixed(2)
+                                                    : 'N/A'}
+                                            </span>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
+                    <div>
+                        <div style={totalStyle}>รวม: ${calculateTotal()}</div>
+                        <button style={buttonStyle} onClick={saveBill}>
+                            บันทึกบิล
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
+        </AuthenticatedLayout>
     );
 };
 
