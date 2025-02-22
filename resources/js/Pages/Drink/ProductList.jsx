@@ -116,6 +116,8 @@ const ProductList = () => {
     };
 
     const billStyle = {
+        position: 'sticky',   // ทำให้บิลคงที่ในตำแหน่งเดิม
+        top: '0',             // ติดอยู่ด้านบนสุดของ container
         border: '1px solid #ddd',
         borderRadius: '8px',
         padding: '20px',
@@ -124,6 +126,7 @@ const ProductList = () => {
         flexDirection: 'column',
         height: '80vh',
     };
+    
 
     const billItemStyle = {
         display: 'flex',
