@@ -1,14 +1,8 @@
-import React from 'react';
-import ProductList from './Drink/ProductList';
-import OrderList from './Drink/OrderList';
-import CategoryList from './Drink/CategoryList';
+import React from "react";
+import ProductList from "./Drink/ProductList";
 
 const Drink = () => {
-    return (
-        <div>
-            <ProductList />
-        </div>
-    );
+    return <ProductList />;
 };
 
 export default Drink;
